@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationScreen
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationViewModel
+import com.alpertign.diaryapp.presentation.screens.home.HomeScreen
 import com.alpertign.diaryapp.util.Constants.APP_ID
 import com.alpertign.diaryapp.util.Constants.WRITE_SCREEN_ARGUEMENT_KEY
 import com.stevdzasan.messagebar.MessageBarState
@@ -41,12 +42,14 @@ fun SetupNavGraph(startDestination: String, navController: NavHostController) {
     ) {
 
         authenticationRoute(
-            navigateToHome= {
+            navigateToHome = {
                 navController.popBackStack()
                 navController.navigate(Screen.Home.route)
             }
         )
-        homeRoute()
+        homeRoute(navigateToWrite = {
+            navController.navigate(Screen.Write.route)
+        })
         writeRoute()
     }
 }
@@ -55,7 +58,7 @@ fun NavGraphBuilder.authenticationRoute(
     navigateToHome: () -> Unit
 ) {
     composable(route = Screen.Authentication.route) {
-        val viewModel : AuthenticationViewModel = viewModel()
+        val viewModel: AuthenticationViewModel = viewModel()
         val authenticated by viewModel.authenticated
         val loadingState by viewModel.loadingState
         val oneTapState = rememberOneTapSignInState()
@@ -69,21 +72,21 @@ fun NavGraphBuilder.authenticationRoute(
                 oneTapState.open()
                 viewModel.setLoading(true)
             },
-            onTokenIdReceived = {tokenId ->
+            onTokenIdReceived = { tokenId ->
                 viewModel.signInWithMongoAtlas(
-                   tokenId = tokenId,
-                   onSuccess = {
-                       messageBarState.addSuccess("Successfully Authenticated!")
-                       viewModel.setLoading(false)
-                   },
-                   onError = {
-                       messageBarState.addError(it)
-                       viewModel.setLoading(false)
-                   }
+                    tokenId = tokenId,
+                    onSuccess = {
+                        messageBarState.addSuccess("Successfully Authenticated!")
+                        viewModel.setLoading(false)
+                    },
+                    onError = {
+                        messageBarState.addError(it)
+                        viewModel.setLoading(false)
+                    }
                 )
                 //
             },
-            onDialogDismissed = {message ->
+            onDialogDismissed = { message ->
                 messageBarState.addError(Exception(message))
                 viewModel.setLoading(false)
             },
@@ -92,24 +95,12 @@ fun NavGraphBuilder.authenticationRoute(
     }
 }
 
-fun NavGraphBuilder.homeRoute() {
+fun NavGraphBuilder.homeRoute(navigateToWrite: () -> Unit) {
     composable(route = Screen.Home.route) {
-        val scope = rememberCoroutineScope()
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Button(onClick = {
-                scope.launch (Dispatchers.IO){
-                    App.create(APP_ID).currentUser?.logOut()
-                }
-            }) {
-                Text(text = "LOG OUT")
-            }
-
-        }
+        HomeScreen(
+            onMenuClicked = {},
+            navigateToWrite = navigateToWrite
+        )
 
     }
 }
