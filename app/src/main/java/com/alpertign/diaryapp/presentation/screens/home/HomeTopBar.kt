@@ -20,6 +20,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +34,9 @@ import com.alpertign.diaryapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(onMenuClicked: () -> Unit) {
+fun HomeTopBar(scrollBehavior : TopAppBarScrollBehavior, onMenuClicked: () -> Unit) {
     TopAppBar(
+        scrollBehavior = scrollBehavior,
         title = { Text(text = "Diary") },
         navigationIcon = {
             IconButton(onClick = onMenuClicked) {
