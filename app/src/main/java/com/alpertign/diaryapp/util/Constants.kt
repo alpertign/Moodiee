@@ -7,7 +7,7 @@ object Constants {
 
     const val APP_ID = "mydiaryapp-wnffn"
     const val CLIENT_ID = "914928083214-rvmtea22vk2b3mpihr0h26pcs4ki71qm.apps.googleusercontent.com"
-    const val WRITE_SCREEN_ARGUEMENT_KEY = "diaryId"
+    const val WRITE_SCREEN_ARGUMENT_KEY = "diaryId"
 
 
 }

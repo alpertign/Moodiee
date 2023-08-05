@@ -56,7 +56,8 @@ fun HomeScreen(
     drawerState: DrawerState,
     onMenuClicked: () -> Unit,
     onSignOutClicked: () -> Unit,
-    navigateToWrite: () -> Unit
+    navigateToWrite: () -> Unit,
+    navigateToWriteWithArgs: (String) -> Unit,
 ) {
     var padding by remember { mutableStateOf(PaddingValues()) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -68,12 +69,16 @@ fun HomeScreen(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                HomeTopBar(scrollBehavior = scrollBehavior,onMenuClicked = onMenuClicked)
+                HomeTopBar(
+                    scrollBehavior = scrollBehavior,
+                    onMenuClicked = onMenuClicked
+                )
             },
             floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.padding(end = padding.calculateEndPadding(LayoutDirection.Ltr)),
-                    onClick = navigateToWrite) {
+                    onClick = navigateToWrite
+                ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "New Diary Icon"
@@ -87,7 +92,7 @@ fun HomeScreen(
                         HomeContent(
                             paddingValues = it,
                             diaryNotes = diaries.data,
-                            onClick = {}
+                            onClick = navigateToWriteWithArgs
                         )
                     }
 
