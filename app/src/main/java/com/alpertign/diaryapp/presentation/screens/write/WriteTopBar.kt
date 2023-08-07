@@ -77,7 +77,6 @@ fun WriteTopBar(
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-            Log.e("write top bar","seeceted Diary: ${selectedDiary?.title}")
             if (selectedDiary != null) {
                 DeleteDiaryAction(
                     selectedDiary = selectedDiary,

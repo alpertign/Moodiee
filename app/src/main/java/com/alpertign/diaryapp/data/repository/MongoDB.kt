@@ -13,6 +13,7 @@ import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
 
 /**
@@ -27,6 +28,7 @@ object MongoDB : MongoRepository {
     init {
         configureTheRealm()
     }
+
     override fun configureTheRealm() {
         if (user != null) {
             val config = SyncConfiguration.Builder(
@@ -50,11 +52,17 @@ object MongoDB : MongoRepository {
     }
 
     override fun getAllDiaries(): Flow<Diaries> {
-        return if (user != null){
+        return if (user != null) {
 
             try {
-                realm.query<Diary>(query = "ownerId == $0", user.id)
-                    .sort(property = "date", sortOrder = Sort.DESCENDING)
+                realm.query<Diary>(
+                    query = "ownerId == $0",
+                    user.id
+                )
+                    .sort(
+                        property = "date",
+                        sortOrder = Sort.DESCENDING
+                    )
                     .asFlow()
                     .map { result ->
                         RequestState.Success(
@@ -65,13 +73,28 @@ object MongoDB : MongoRepository {
                             }
                         )
                     }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 flow { emit(RequestState.Error(e)) }
             }
-        }else{
+        } else {
+            flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
+        }
+    }
+
+    override fun getSelectedDiary(diaryId: ObjectId): Flow<RequestState<Diary>> {
+        return if (user != null) {
+            try {
+                realm.query<Diary>(query = "_id == $0", diaryId).asFlow().map {
+                    RequestState.Success(data = it.list.first())
+                }
+            } catch (e: Exception) {
+                flow { emit(RequestState.Error(e)) }
+            }
+        } else {
             flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
         }
     }
 
 }
+
 private class UserNotAuthenticatedException : Exception("User is not Logged in.")
