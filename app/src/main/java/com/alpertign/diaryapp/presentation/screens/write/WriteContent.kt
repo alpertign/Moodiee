@@ -1,5 +1,6 @@
 package com.alpertign.diaryapp.presentation.screens.write
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.alpertign.diaryapp.model.Diary
 import com.alpertign.diaryapp.model.Mood
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -43,14 +45,17 @@ import com.google.accompanist.pager.PagerState
 )
 @Composable
 fun WriteContent(
+    uiState: UiState,
     pagerState: PagerState,
     title: String,
     onTitleChanged: (String) -> Unit,
     description: String,
     onDescriptionChanged: (String) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onSaveClicked: (Diary)-> Unit
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,13 +88,15 @@ fun WriteContent(
                 value = title,
                 onValueChange = onTitleChanged,
                 placeholder = { Text(text = "Title") },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Unspecified,
-                    disabledIndicatorColor = Color.Unspecified,
                     unfocusedIndicatorColor = Color.Unspecified,
+                    disabledIndicatorColor = Color.Unspecified,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 ),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -103,13 +110,15 @@ fun WriteContent(
                 value = description,
                 onValueChange = onDescriptionChanged,
                 placeholder = { Text(text = "Tell me about it.") },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Unspecified,
-                    disabledIndicatorColor = Color.Unspecified,
                     unfocusedIndicatorColor = Color.Unspecified,
+                    disabledIndicatorColor = Color.Unspecified,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                     unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 ),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -123,7 +132,22 @@ fun WriteContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
-                onClick = { /*TODO*/ },
+                onClick = {
+                    if (uiState.title.isNotEmpty() && uiState.description.isNotEmpty()){
+                        onSaveClicked(
+                            Diary().apply {
+                                this.title = uiState.title
+                                this.description = uiState.description
+                            }
+                        )
+                    }else{
+                        Toast.makeText(
+                            context,
+                            "Fields can not be empty.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                          },
                 shape = Shapes().small
             ) {
                 Text(text = "Save")

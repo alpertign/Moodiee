@@ -84,7 +84,10 @@ object MongoDB : MongoRepository {
     override fun getSelectedDiary(diaryId: ObjectId): Flow<RequestState<Diary>> {
         return if (user != null) {
             try {
-                realm.query<Diary>(query = "_id == $0", diaryId).asFlow().map {
+                realm.query<Diary>(
+                    query = "_id == $0",
+                    diaryId
+                ).asFlow().map {
                     RequestState.Success(data = it.list.first())
                 }
             } catch (e: Exception) {
@@ -92,6 +95,43 @@ object MongoDB : MongoRepository {
             }
         } else {
             flow { emit(RequestState.Error(UserNotAuthenticatedException())) }
+        }
+    }
+
+    override suspend fun addNewDiary(diary: Diary): RequestState<Diary> {
+        return if (user != null) {
+            realm.write {
+                try {
+                    val addedDiary = copyToRealm(diary.apply { ownerId = user.id })
+                    RequestState.Success(data = addedDiary)
+                } catch (e: Exception) {
+                    RequestState.Error(e)
+                }
+            }
+        } else {
+            RequestState.Error(UserNotAuthenticatedException())
+        }
+    }
+
+    override suspend fun updateDiary(diary: Diary): RequestState<Diary> {
+        return if (user != null) {
+            realm.write {
+                val queriedDiary = query<Diary>(query = "_id == $0",diary._id).first().find()
+                if (queriedDiary != null){
+                    queriedDiary.apply {
+                        title = diary.title
+                        description = diary.description
+                        mood = diary.mood
+                        images = diary.images
+                        date = diary.date
+                    }
+                    RequestState.Success(data = queriedDiary)
+                }else{
+                    RequestState.Error(error = Exception("Queried diary does not exist"))
+                }
+            }
+        } else {
+            RequestState.Error(UserNotAuthenticatedException())
         }
     }
 

@@ -1,10 +1,10 @@
 package com.alpertign.diaryapp.presentation.screens.write
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,6 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.alpertign.diaryapp.model.Diary
 import com.alpertign.diaryapp.presentation.components.DisplayAlertDialog
+import com.alpertign.diaryapp.util.toInstant
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockSelection
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 /**
  * Created by Alperen Acikgoz on 03,August,2023
@@ -35,9 +49,42 @@ import com.alpertign.diaryapp.presentation.components.DisplayAlertDialog
 @Composable
 fun WriteTopBar(
     selectedDiary: Diary?,
+    moodName: () -> String,
+    onDateTimeUpdated: (ZonedDateTime) -> Unit,
     onDeleteConfirmed: () -> Unit,
     onBackPressed: () -> Unit
 ) {
+    val dateDialog = rememberUseCaseState()
+    val timeDialog = rememberUseCaseState()
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    var currentTime by remember { mutableStateOf(LocalTime.now()) }
+    val formattedDate = remember(key1 = currentDate) {
+        DateTimeFormatter
+            .ofPattern("dd MMM yyyy")
+            .format(currentDate).uppercase()
+    }
+    val formattedTime = remember(key1 = currentTime) {
+        DateTimeFormatter
+            .ofPattern("hh:mm a")
+            .format(currentTime).uppercase()
+    }
+
+    var dateTimeUpdated by remember {
+        mutableStateOf(false)
+    }
+
+    val selectedDiaryDateTime = remember(selectedDiary) {
+        if (selectedDiary != null) {
+            SimpleDateFormat(
+                "dd MMM yyyy, hh:mm a",
+                Locale.getDefault()
+            )
+                .format(Date.from(selectedDiary.date.toInstant())).uppercase()
+        } else {
+            "Unknown"
+        }
+
+    }
     CenterAlignedTopAppBar(
 
         navigationIcon = {
@@ -52,7 +99,7 @@ fun WriteTopBar(
             Column {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "Happy",
+                    text = moodName(),
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         fontWeight = FontWeight.Bold
@@ -61,7 +108,10 @@ fun WriteTopBar(
                 )
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "10 JAN 2023, 10:00 AM",
+                    text =
+                    if (selectedDiary != null && dateTimeUpdated) "$formattedDate, $formattedTime"
+                    else if (selectedDiary != null) selectedDiaryDateTime
+                    else "$formattedDate, $formattedTime",
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.bodySmall.fontSize
                     ),
@@ -70,19 +120,68 @@ fun WriteTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Date Icon",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+            if (dateTimeUpdated) {
+                IconButton(onClick = {
+                    currentDate = LocalDate.now()
+                    currentTime = LocalTime.now()
+                    dateTimeUpdated = false
+                    onDateTimeUpdated(
+                        ZonedDateTime.of(
+                            currentDate,
+                            currentTime,
+                            ZoneId.systemDefault()
+                        )
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            } else {
+                IconButton(onClick = {
+                    dateDialog.show()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Date Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
+
             if (selectedDiary != null) {
                 DeleteDiaryAction(
                     selectedDiary = selectedDiary,
                     onDeleteConfirmed = onDeleteConfirmed
                 )
             }
+        }
+    )
+
+    CalendarDialog(
+        state = dateDialog,
+        selection = CalendarSelection.Date { localDate ->
+            currentDate = localDate
+            timeDialog.show()
+        }
+    )
+    ClockDialog(
+        state = timeDialog,
+        selection = ClockSelection.HoursMinutes { hours, minutes ->
+            currentTime = LocalTime.of(
+                hours,
+                minutes
+            )
+            dateTimeUpdated = true
+            onDateTimeUpdated(
+                ZonedDateTime.of(
+                    currentDate,
+                    currentTime,
+                    ZoneId.systemDefault()
+                )
+            )
         }
     )
 }
@@ -101,7 +200,8 @@ fun DeleteDiaryAction(
         DropdownMenuItem(
             text = {
                 Text(text = "Delete")
-            }, onClick = {
+            },
+            onClick = {
                 openDialog = true
                 expanded = false
             }

@@ -5,6 +5,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.alpertign.diaryapp.model.Mood
 import com.alpertign.diaryapp.presentation.components.DisplayAlertDialog
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationScreen
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationViewModel
@@ -72,9 +74,11 @@ fun SetupNavGraph(
                 navController.navigate(Screen.Write.passDiaryId(diaryId = it))
             }
         )
-        writeRoute(onBackPressed = {
-            navController.popBackStack()
-        })
+        writeRoute(
+            navigateBack = {
+                navController.popBackStack()
+            }
+        )
     }
 }
 
@@ -182,7 +186,7 @@ fun NavGraphBuilder.homeRoute(
 }
 
 @OptIn(ExperimentalPagerApi::class)
-fun NavGraphBuilder.writeRoute(onBackPressed: () -> Unit) {
+fun NavGraphBuilder.writeRoute(navigateBack: () -> Unit) {
 
     composable(
         route = Screen.Write.route,
@@ -191,23 +195,37 @@ fun NavGraphBuilder.writeRoute(onBackPressed: () -> Unit) {
             nullable = true
         })
     ) {
-        val viewModel : WriteViewModel = viewModel()
+        val viewModel: WriteViewModel = viewModel()
         val uiState = viewModel.uiState
         val pagerState = rememberPagerState()
-        
+        val pageNumber by remember {
+            derivedStateOf { pagerState.currentPage }
+        }
+
         LaunchedEffect(
             key1 = uiState
-        ){
-            Log.d("SelectedDiary","${uiState.selectedDiaryId}")
+        ) {
+            Log.d(
+                "SelectedDiary",
+                "${uiState.selectedDiaryId}"
+            )
         }
         WriteScreen(
             uiState = uiState,
-            selectedDiary = null,
             pagerState = pagerState,
-            onBackPressed = onBackPressed,
-            onTitleChanged = {viewModel.setTitle(it)},
-            onDescriptionChanged = {viewModel.setDescription(it)},
-            onDeleteConfirmed = {}
+            moodName = { Mood.values()[pageNumber].name },
+            onBackPressed = navigateBack,
+            onTitleChanged = { viewModel.setTitle(it) },
+            onDescriptionChanged = { viewModel.setDescription(it) },
+            onDateTimeUpdated = {viewModel.updateDateTime(zonedDateTime = it)},
+            onDeleteConfirmed = {},
+            onSaveClicked = {
+                viewModel.upsertDiary(
+                    diary = it.apply { mood = Mood.values()[pageNumber].name },
+                    onSuccess = navigateBack,
+                    onError = {Log.d("MOngDBError","$it")}
+                )
+            }
         )
 
     }

@@ -23,7 +23,6 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             MongoDB.getAllDiaries().collect() { result ->
                 diaries.value = result
-                Log.e("HomeViewModel","diaries.value : ${diaries.value}")
             }
         }
     }
