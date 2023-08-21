@@ -2,7 +2,7 @@ package com.alpertign.diaryapp.data.repository
 
 import com.alpertign.diaryapp.model.Diary
 import com.alpertign.diaryapp.util.Constants.APP_ID
-import com.alpertign.diaryapp.util.RequestState
+import com.alpertign.diaryapp.model.RequestState
 import com.alpertign.diaryapp.util.toInstant
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query

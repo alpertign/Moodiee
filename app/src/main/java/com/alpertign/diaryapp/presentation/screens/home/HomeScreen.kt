@@ -36,13 +36,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.alpertign.diaryapp.R
 import com.alpertign.diaryapp.data.repository.Diaries
-import com.alpertign.diaryapp.util.RequestState
+import com.alpertign.diaryapp.model.RequestState
 
 /**
  * Created by Alperen Acikgoz on 27,July,2023

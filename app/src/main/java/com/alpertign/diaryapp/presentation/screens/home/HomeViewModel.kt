@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpertign.diaryapp.data.repository.Diaries
 import com.alpertign.diaryapp.data.repository.MongoDB
-import com.alpertign.diaryapp.util.RequestState
+import com.alpertign.diaryapp.model.RequestState
 import kotlinx.coroutines.launch
 
 /**

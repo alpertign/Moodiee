@@ -1,4 +1,4 @@
-package com.alpertign.diaryapp.util
+package com.alpertign.diaryapp.model
 
 /**
  * Created by Alperen Acikgoz on 01,August,2023

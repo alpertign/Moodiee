@@ -1,5 +1,6 @@
 package com.alpertign.diaryapp.presentation.screens.write
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,10 +37,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.alpertign.diaryapp.model.Diary
+import com.alpertign.diaryapp.model.GalleryImage
+import com.alpertign.diaryapp.model.GalleryState
 import com.alpertign.diaryapp.model.Mood
+import com.alpertign.diaryapp.presentation.components.GalleryUploader
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.launch
 
 /**
@@ -55,11 +60,14 @@ fun WriteContent(
     uiState: UiState,
     pagerState: PagerState,
     title: String,
+    galleryState: GalleryState,
     onTitleChanged: (String) -> Unit,
     description: String,
     onDescriptionChanged: (String) -> Unit,
     paddingValues: PaddingValues,
-    onSaveClicked: (Diary) -> Unit
+    onSaveClicked: (Diary) -> Unit,
+    onImageSelect:(Uri) -> Unit,
+    onImageClicked: (GalleryImage) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -149,7 +157,14 @@ fun WriteContent(
             )
         }
         Column(verticalArrangement = Arrangement.Bottom) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            GalleryUploader(
+                galleryState = galleryState,
+                onAddClicked = { focusManager.clearFocus()},
+                onImageSelect = onImageSelect,
+                onImageClicked =onImageClicked
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,6 +175,7 @@ fun WriteContent(
                             Diary().apply {
                                 this.title = uiState.title
                                 this.description = uiState.description
+                                this.images = galleryState.images.map { it.remoteImagePath }.toRealmList()
                             }
                         )
                     } else {

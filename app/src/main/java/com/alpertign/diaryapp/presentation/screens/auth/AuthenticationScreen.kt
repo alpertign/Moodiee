@@ -1,7 +1,6 @@
 package com.alpertign.diaryapp.presentation.screens.auth
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -11,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.alpertign.diaryapp.util.Constants.CLIENT_ID
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.stevdzasan.messagebar.ContentWithMessageBar
 import com.stevdzasan.messagebar.MessageBarState
 import com.stevdzasan.onetap.OneTapSignInState
@@ -28,7 +29,8 @@ fun AuthenticationScreen(
     oneTapState: OneTapSignInState,
     messageBarState: MessageBarState,
     onButtonClicked: () -> Unit,
-    onTokenIdReceived: (String) -> Unit,
+    onSuccessfulFirebaseSignIn: (String) -> Unit,
+    onFailedFirebaseSignIn: (Exception) -> Unit,
     onDialogDismissed: (String) -> Unit,
     navigateToHome: () -> Unit,
 
@@ -52,7 +54,15 @@ fun AuthenticationScreen(
         state = oneTapState,
         clientId = CLIENT_ID,
         onTokenIdReceived = { tokenId ->
-            onTokenIdReceived(tokenId)
+            val credential =GoogleAuthProvider.getCredential(tokenId,null)
+            FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    onSuccessfulFirebaseSignIn(tokenId)
+                } else{
+                    task.exception?.let { it -> onFailedFirebaseSignIn(it) }
+                }
+            }
+
         },
         onDialogDismissed = { message ->
             onDialogDismissed(message)
