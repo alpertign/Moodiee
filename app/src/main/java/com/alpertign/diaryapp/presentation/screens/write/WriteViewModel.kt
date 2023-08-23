@@ -2,12 +2,11 @@ package com.alpertign.diaryapp.presentation.screens.write
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import com.alpertign.diaryapp.model.Mood
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpertign.diaryapp.data.database.ImageToDeleteDao
 import com.alpertign.diaryapp.data.database.ImageToUploadDao
@@ -17,8 +16,9 @@ import com.alpertign.diaryapp.data.repository.MongoDB
 import com.alpertign.diaryapp.model.Diary
 import com.alpertign.diaryapp.model.GalleryImage
 import com.alpertign.diaryapp.model.GalleryState
-import com.alpertign.diaryapp.util.Constants.WRITE_SCREEN_ARGUMENT_KEY
+import com.alpertign.diaryapp.model.Mood
 import com.alpertign.diaryapp.model.RequestState
+import com.alpertign.diaryapp.util.Constants.WRITE_SCREEN_ARGUMENT_KEY
 import com.alpertign.diaryapp.util.fetchImagesFromFirebase
 import com.alpertign.diaryapp.util.toRealmInstant
 import com.google.firebase.auth.FirebaseAuth

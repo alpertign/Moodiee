@@ -21,8 +21,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.alpertign.diaryapp.model.GalleryImage
 import com.alpertign.diaryapp.model.Mood
+import com.alpertign.diaryapp.model.RequestState
 import com.alpertign.diaryapp.presentation.components.DisplayAlertDialog
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationScreen
 import com.alpertign.diaryapp.presentation.screens.auth.AuthenticationViewModel
@@ -32,8 +32,6 @@ import com.alpertign.diaryapp.presentation.screens.write.WriteScreen
 import com.alpertign.diaryapp.presentation.screens.write.WriteViewModel
 import com.alpertign.diaryapp.util.Constants.APP_ID
 import com.alpertign.diaryapp.util.Constants.WRITE_SCREEN_ARGUMENT_KEY
-import com.alpertign.diaryapp.model.RequestState
-import com.alpertign.diaryapp.model.rememberGalleryState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.stevdzasan.messagebar.rememberMessageBarState

@@ -2,7 +2,23 @@ package com.alpertign.diaryapp.model
 
 import androidx.compose.ui.graphics.Color
 import com.alpertign.diaryapp.R
-import com.alpertign.diaryapp.ui.theme.*
+import com.alpertign.diaryapp.ui.theme.AngryColor
+import com.alpertign.diaryapp.ui.theme.AwfulColor
+import com.alpertign.diaryapp.ui.theme.BoredColor
+import com.alpertign.diaryapp.ui.theme.CalmColor
+import com.alpertign.diaryapp.ui.theme.DepressedColor
+import com.alpertign.diaryapp.ui.theme.DisappointedColor
+import com.alpertign.diaryapp.ui.theme.HappyColor
+import com.alpertign.diaryapp.ui.theme.HumorousColor
+import com.alpertign.diaryapp.ui.theme.LonelyColor
+import com.alpertign.diaryapp.ui.theme.MysteriousColor
+import com.alpertign.diaryapp.ui.theme.NeutralColor
+import com.alpertign.diaryapp.ui.theme.RomanticColor
+import com.alpertign.diaryapp.ui.theme.ShamefulColor
+import com.alpertign.diaryapp.ui.theme.SurprisedColor
+import com.alpertign.diaryapp.ui.theme.SuspiciousColor
+import com.alpertign.diaryapp.ui.theme.TenseColor
+
 /**
  * Created by Alperen Acikgoz on 29,July,2023
  */
