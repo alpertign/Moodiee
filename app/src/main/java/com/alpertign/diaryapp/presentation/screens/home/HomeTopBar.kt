@@ -1,32 +1,30 @@
 package com.alpertign.diaryapp.presentation.screens.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import com.alpertign.diaryapp.R
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * Created by Alperen Acikgoz on 27,July,2023
@@ -34,7 +32,17 @@ import com.alpertign.diaryapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(scrollBehavior : TopAppBarScrollBehavior, onMenuClicked: () -> Unit) {
+fun HomeTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    onMenuClicked: () -> Unit,
+    dateIsSelected: Boolean,
+    onDateSelected: (ZonedDateTime) -> Unit,
+    onDateReset: () -> Unit,
+) {
+
+    val dateDialog = rememberUseCaseState()
+    val pickedDate by remember { mutableStateOf(LocalDate.now()) }
+    val scope = rememberCoroutineScope()
     TopAppBar(
         scrollBehavior = scrollBehavior,
         title = { Text(text = "Diary") },
@@ -48,14 +56,38 @@ fun HomeTopBar(scrollBehavior : TopAppBarScrollBehavior, onMenuClicked: () -> Un
             }
         },
         actions = {
-            IconButton(onClick = onMenuClicked) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Date Icon ",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+            if (dateIsSelected) {
+                IconButton(onClick = onDateReset) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Icon ",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            } else {
+                IconButton(onClick = { scope.launch { dateDialog.show() } }) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Date Icon ",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
+    )
+
+    CalendarDialog(
+        state = dateDialog,
+        selection = CalendarSelection.Date { localDate ->
+            onDateSelected(
+                ZonedDateTime.of(
+                    localDate,
+                    LocalTime.now(),
+                    ZoneId.systemDefault()
+                )
+            )
+        },
+        config = CalendarConfig(monthSelection = true, yearSelection = true)
     )
 }
 

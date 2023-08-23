@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.alpertign.diaryapp.R
 import com.alpertign.diaryapp.data.repository.Diaries
 import com.alpertign.diaryapp.model.RequestState
+import java.time.ZonedDateTime
 
 /**
  * Created by Alperen Acikgoz on 27,July,2023
@@ -58,6 +59,9 @@ fun HomeScreen(
     onDeleteAllClicked: () -> Unit,
     navigateToWrite: () -> Unit,
     navigateToWriteWithArgs: (String) -> Unit,
+    dateIsSelected: Boolean,
+    onDateSelected: (ZonedDateTime) -> Unit,
+    onDateReset: () -> Unit,
 ) {
     var padding by remember { mutableStateOf(PaddingValues()) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -72,7 +76,10 @@ fun HomeScreen(
             topBar = {
                 HomeTopBar(
                     scrollBehavior = scrollBehavior,
-                    onMenuClicked = onMenuClicked
+                    onMenuClicked = onMenuClicked,
+                    dateIsSelected = dateIsSelected,
+                    onDateSelected = onDateSelected,
+                    onDateReset = onDateReset
                 )
             },
             floatingActionButton = {
