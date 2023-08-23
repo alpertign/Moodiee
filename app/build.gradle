@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace 'com.alpertign.diaryapp'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.alpertign.diaryapp"
         minSdk 24
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
